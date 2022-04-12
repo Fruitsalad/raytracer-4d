@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+    }
+    
+    canvas.emscripten {
+      background-color: black;
+      border: 0 none;
+      margin: 0 auto;
+      display: block;
+    }
+    
+    #loadingDiv {
+      font-family: sans-serif;
+      color: grey;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+<div id="loadingDiv">Loading...</div>
+<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+
+<script type='text/javascript'>
+  var name_root = "raytracer_4d";
+  var js_file = name_root+".js";
+  var data_file = name_root+".data";
+  
+  var Module = {
+    print: function(text) {
+      console.log(text);
+    },
+    
+    printErr: function(text) {
+      if (arguments.length > 1)
+        text = Array.prototype.slice.call(arguments).join('\n');
+      alert(text);
+    },
+    
+    onRuntimeInitialized: function() {
+      document.getElementById('loadingDiv').style.display = 'none';
+    },
+    
+    canvas: (function() {
+      return document.getElementById('canvas');
+    })()
+  };
+  
+  (function() {
+    var memoryInitializer = data_file;
+    if (typeof Module['locateFile'] === 'function') {
+      memoryInitializer = Module['locateFile'](memoryInitializer);
+    } else if (Module['memoryInitializerPrefixURL']) {
+      memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
+    }
+    var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+    xhr.open('GET', memoryInitializer, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.send(null);
+  })();
+  
+  var script = document.createElement('script');
+  script.src = js_file;
+  document.body.appendChild(script);
+
+  // Module.ccall('mainf', null, null);
+</script>
+
+</body>
+</html>
